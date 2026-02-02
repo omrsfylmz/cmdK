@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  Removed global resets (body, :root) as they apply to the Shadow Root 
+  and can cause layout issues on the host page.
+  Values like min-height: 100vh on :root inside Shadow DOM 
+  will force the shadow host to take up space.
+*/
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+}

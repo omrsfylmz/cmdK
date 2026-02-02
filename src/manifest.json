@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "CmdK Bookmarks",
+  "version": "1.0.0",
+  "description": "Cmd+K command palette for bookmarks and more",
+  "permissions": [
+    "bookmarks",
+    "tabs"
+  ],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/content/index.tsx"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}
