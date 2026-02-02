@@ -63,61 +63,101 @@ const CommandMenu = () => {
       className="fixed inset-0 z-[99999] flex items-start justify-center bg-black/50 p-[16px] font-sans backdrop-blur-sm pt-[20vh]"
       onClick={handleBackdropClick}
     >
-      <Command shouldFilter={false} className="w-full max-w-[640px] overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl text-white">
-        <div className="flex items-center border-b border-gray-700 px-[16px]" cmdk-input-wrapper="">
-          <Search className="mr-[12px] h-[24px] w-[24px] shrink-0 text-gray-400" />
+      <Command shouldFilter={false} className="w-full max-w-[640px] overflow-hidden rounded-xl border border-[#333] bg-[#0d1117] shadow-2xl text-gray-200 antialiased font-sans">
+        <div className="flex items-center border-b border-[#333] px-[16px] relative" cmdk-input-wrapper="">
+          <Search className="mr-[12px] h-[20px] w-[20px] shrink-0 text-gray-500" />
           <Command.Input
-            className="flex h-[64px] w-full rounded-md bg-transparent py-[16px] text-[18px] outline-none placeholder:text-gray-500 text-white"
-            placeholder="Search bookmarks or type to Google..."
+            className="flex h-[60px] w-full bg-transparent py-[16px] text-[16px] outline-none placeholder:text-gray-600 text-gray-200"
+            placeholder="Type a command or search..."
             value={search}
             onValueChange={setSearch}
             autoFocus
           />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+             <kbd className="hidden sm:inline-flex h-6 select-none items-center gap-1 rounded border border-[#333] bg-[#161b22] px-1.5 font-mono text-[10px] font-medium text-gray-500 opacity-100">
+               <span className="text-xs">ESC</span>
+            </kbd>
+          </div>
         </div>
-        <Command.List className="max-h-[400px] overflow-y-auto p-[12px] scroll-py-[12px]">
-          <Command.Empty className="py-[32px] text-center text-gray-500 text-[16px]">
+        
+        <Command.List className="max-h-[400px] overflow-y-auto p-[8px] scroll-py-[8px]">
+          <Command.Empty className="py-[32px] text-center text-gray-500 text-[14px]">
             No results found.
           </Command.Empty>
           
           {items.length > 0 && (
-            <Command.Group heading="Bookmarks" className="text-gray-400 text-[12px] font-semibold mb-[8px] px-[8px] uppercase tracking-wider">
+            <Command.Group heading="Bookmarks" className="text-gray-500 text-[11px] font-medium mb-[8px] px-[8px] mt-[8px] uppercase tracking-wider">
               {items.map((item) => (
                 <Command.Item
                   key={item.id}
                   value={item.title}
                   onSelect={() => handleSelect(item.url)}
-                  className="relative flex cursor-default select-none items-center rounded-lg px-[12px] py-[12px] text-[16px] outline-none aria-selected:bg-gray-800 aria-selected:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-gray-300 transition-colors"
+                  className="group relative flex cursor-pointer select-none items-center rounded-md px-[12px] py-[12px] text-[14px] outline-none data-[selected='true']:bg-[#161b22] data-[selected='true']:text-white text-gray-400 transition-all duration-200 border-l-2 border-transparent data-[selected='true']:border-blue-500"
                 >
-                  <Bookmark className="mr-[12px] h-[20px] w-[20px] text-blue-400" />
-                  <span className="truncate">{item.title}</span>
-                  <span className="ml-auto text-[12px] text-gray-500 truncate max-w-[200px]">{item.url}</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded bg-[#1f242e] mr-3 group-data-[selected=true]:bg-blue-500/10 group-data-[selected=true]:text-blue-400">
+                    <Bookmark className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="truncate font-medium text-gray-300 group-data-[selected=true]:text-white">{item.title}</span>
+                    <span className="truncate text-[11px] text-gray-600 group-data-[selected=true]:text-gray-500">{item.url}</span>
+                  </div>
+                  <span className="ml-auto text-[11px] text-gray-600 group-data-[selected=true]:text-gray-500 hidden sm:inline-block">Jump</span>
                 </Command.Item>
               ))}
             </Command.Group>
           )}
 
           {search.length > 0 && (
-            <Command.Group heading="Web Search" className="text-gray-400 text-[12px] font-semibold mb-[8px] px-[8px] uppercase tracking-wider mt-[16px]">
+            <Command.Group heading="Web Search" className="text-gray-500 text-[11px] font-medium mb-[8px] px-[8px] mt-[16px] uppercase tracking-wider">
               <Command.Item
                 value={`google-${search}`}
                 onSelect={() => {
                   setOpen(false);
                   window.open(`https://www.google.com/search?q=${encodeURIComponent(search)}`, '_blank');
                 }}
-                className="relative flex cursor-default select-none items-center rounded-lg px-[12px] py-[12px] text-[16px] outline-none aria-selected:bg-gray-800 aria-selected:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-gray-300 transition-colors"
+                 className="group relative flex cursor-pointer select-none items-center rounded-md px-[12px] py-[12px] text-[14px] outline-none data-[selected='true']:bg-[#161b22] data-[selected='true']:text-white text-gray-400 transition-all duration-200 border-l-2 border-transparent data-[selected='true']:border-green-500"
                 >
-                  <Search className="mr-[12px] h-[20px] w-[20px] text-green-400" />
-                  <span className="truncate">Search on Google for <span className="text-white font-medium">"{search}"</span></span>
+                   <div className="flex h-8 w-8 items-center justify-center rounded bg-[#1f242e] mr-3 group-data-[selected=true]:bg-green-500/10 group-data-[selected=true]:text-green-400">
+                      <Search className="h-4 w-4" />
+                   </div>
+                  <span className="truncate font-medium text-gray-300 group-data-[selected=true]:text-white">Search Google for <span className="text-white font-bold">"{search}"</span></span>
+                  <div className="ml-auto flex items-center gap-1">
+                    <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-[#333] bg-[#21262d] px-1.5 font-mono text-[10px] font-medium text-gray-400 opacity-100">
+                        ↩
+                    </kbd>
+                  </div>
               </Command.Item>
             </Command.Group>
           )}
 
            {items.length === 0 && search.length === 0 && (
-            <div className="p-[32px] text-center text-gray-500 text-[16px]">
-                Type to search your bookmarks...
+            <div className="flex flex-col items-center justify-center py-[48px] text-center text-gray-500">
+                <p className="text-[14px]">Type to search bookmarks...</p>
+                <div className="mt-4 flex gap-2">
+                    <span className="px-2 py-1 rounded bg-[#161b22] text-[11px] text-gray-400 border border-[#333]">CMD + K</span>
+                    <span className="px-2 py-1 rounded bg-[#161b22] text-[11px] text-gray-400 border border-[#333]">ESC</span>
+                </div>
             </div>
            )}
         </Command.List>
+
+        <div className="border-t border-[#333] bg-[#161b22] px-[16px] py-[8px] flex justify-between items-center">
+            <div className="flex gap-4 text-[11px] text-gray-500 font-medium">
+                <span className="flex items-center gap-1">
+                    <kbd className="h-4 w-4 flex items-center justify-center rounded bg-[#21262d] border border-[#333]">↓</kbd> 
+                    <kbd className="h-4 w-4 flex items-center justify-center rounded bg-[#21262d] border border-[#333]">↑</kbd> 
+                    <span>Navigate</span>
+                </span>
+                <span className="flex items-center gap-1">
+                    <kbd className="h-4 px-1 flex items-center justify-center rounded bg-[#21262d] border border-[#333]">↵</kbd> 
+                    <span>Select</span>
+                </span>
+            </div>
+            <div className="text-[11px] text-gray-600">
+                CmdK Extension
+            </div>
+        </div>
+
       </Command>
     </div>
   );
