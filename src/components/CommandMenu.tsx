@@ -18,14 +18,18 @@ const CommandMenu = () => {
       console.log('CmdK: Key pressed:', e.key, 'Meta:', e.metaKey, 'Ctrl:', e.ctrlKey);
       if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || e.key === 'Escape') {
         if (e.key === 'Escape' && !open) return;
+        
         e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation(); // Critical for YouTube to stop its own handlers
+        
         setOpen((open) => e.key === 'Escape' ? false : !open);
       }
     };
 
-    document.addEventListener('keydown', down, true);
-    return () => document.removeEventListener('keydown', down, true);
-  }, []);
+    window.addEventListener('keydown', down, true);
+    return () => window.removeEventListener('keydown', down, true);
+  }, [open]);
 
   useEffect(() => {
     if (search.length > 0) {
