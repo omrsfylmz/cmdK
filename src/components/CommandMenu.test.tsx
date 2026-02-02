@@ -98,4 +98,28 @@ describe('CommandMenu', () => {
     // but explicit restore if needed:
     vi.stubGlobal('chrome', { runtime: { sendMessage: vi.fn(), lastError: undefined } });
   });
+
+  it('prevents key events from bubbling to window while open', async () => {
+    const windowKeyDownSpy = vi.fn();
+    window.addEventListener('keydown', windowKeyDownSpy);
+
+    render(<CommandMenu />);
+    
+    // Open menu first
+    fireEvent.keyDown(window, { key: 'k', metaKey: true });
+    
+    // Find input
+    const input = screen.getByPlaceholderText(/Type a command/i);
+    
+    // Type in input
+    fireEvent.keyDown(input, { key: 'a', code: 'KeyA' });
+    fireEvent.keyUp(input, { key: 'a', code: 'KeyA' });
+
+    // The window spy should NOT have been called for 'a' because we stopped propagation
+    // Note: The spy WILL be called for the initial 'Cmd+K' because that was on window directly.
+    // We check that it wasn't called with 'a'.
+    expect(windowKeyDownSpy).not.toHaveBeenCalledWith(expect.objectContaining({ key: 'a' }));
+
+    window.removeEventListener('keydown', windowKeyDownSpy);
+  });
 });

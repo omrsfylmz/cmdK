@@ -117,6 +117,8 @@ const CommandMenu = () => {
     <div
       className="fixed inset-0 z-[99999] flex items-start justify-center bg-black/50 p-[16px] font-sans backdrop-blur-sm pt-[20vh]"
       onClick={handleBackdropClick}
+      onKeyDown={(e) => e.stopPropagation()}
+      onKeyUp={(e) => e.stopPropagation()}
     >
       <Command shouldFilter={false} className="w-full max-w-[640px] overflow-hidden rounded-xl border border-[#333] bg-[#0d1117] shadow-2xl text-gray-200 antialiased font-sans">
         <div className="flex items-center border-b border-[#333] px-[16px] relative" cmdk-input-wrapper="">

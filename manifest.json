@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CmdK Bookmarks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cmd+K command palette for bookmarks and more",
   "permissions": [
     "bookmarks",
