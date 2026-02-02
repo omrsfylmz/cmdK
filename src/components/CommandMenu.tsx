@@ -42,7 +42,12 @@ const CommandMenu = () => {
         if (chrome?.runtime?.sendMessage) {
           chrome.runtime.sendMessage({ type: 'GET_BOOKMARKS' }, (response) => {
             if (chrome.runtime.lastError) {
-              console.warn('CmdK: Runtime error (GET_BOOKMARKS):', JSON.stringify(chrome.runtime.lastError));
+              const msg = JSON.stringify(chrome.runtime.lastError);
+              if (msg.includes('invalidated') || msg.includes('message port closed')) {
+                 console.log('CmdK: Extension context invalidated (Reload detected). Please refresh the page.');
+              } else {
+                 console.warn('CmdK: Runtime error (GET_BOOKMARKS):', msg);
+              }
               return;
             }
             if (response) {
@@ -50,12 +55,15 @@ const CommandMenu = () => {
             }
           });
         } else {
-            console.warn('CmdK: chrome.runtime.sendMessage is not available.');
-            // Fallback for dev/invalidated state
+            console.log('CmdK: Extension updated or context invalidated. Please refresh the page to reconnect.');
             setItems([]); 
         }
-      } catch (error) {
-        console.warn('CmdK: Exception in GET_BOOKMARKS:', error);
+      } catch (error: any) {
+        if (error.message?.includes('invalidated') || error.message?.includes('Extension context')) {
+             console.log('CmdK: Extension context invalidated. Please refresh the page.');
+        } else {
+             console.warn('CmdK: Exception in GET_BOOKMARKS:', error);
+        }
       }
     }
   }, [open]);
