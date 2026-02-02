@@ -40,7 +40,7 @@ describe('CommandMenu', () => {
       { id: '1', title: 'Test Bookmark', url: 'https://test.com' }
     ];
 
-    (global.chrome.runtime.sendMessage as any).mockImplementation((message, callback) => {
+    (global.chrome.runtime.sendMessage as any).mockImplementation((message: any, callback: (response: any) => void) => {
       if (message.type === 'GET_BOOKMARKS') {
         callback(mockBookmarks);
       }
@@ -56,7 +56,7 @@ describe('CommandMenu', () => {
 
   it('handles "Extension context invalidated" error gracefully', async () => {
     // Simulate runtime error
-    (global.chrome.runtime.sendMessage as any).mockImplementation((message, callback) => {
+    (global.chrome.runtime.sendMessage as any).mockImplementation((_message: any, callback: (response: any) => void) => {
         // Simulate immediate error or error in callback check
         global.chrome.runtime.lastError = { message: 'Extension context invalidated.' };
         // Callback might still be called or not.
