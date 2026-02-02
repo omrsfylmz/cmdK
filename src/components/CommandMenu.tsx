@@ -1,6 +1,7 @@
 import { Command } from 'cmdk';
 import { Bookmark, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import logo from '../assets/logo.png';
 
 interface SearchResult {
   id: string;
@@ -8,12 +9,16 @@ interface SearchResult {
   url: string;
 }
 
+// Assuming BookmarkItem is similar to SearchResult or will be defined elsewhere
+type BookmarkItem = SearchResult;
+
 const CommandMenu = () => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [items, setItems] = useState<SearchResult[]>([]);
+  const [items, setItems] = useState<BookmarkItem[]>([]);
 
   useEffect(() => {
+    // Listen for Cmd+K
     const down = (e: KeyboardEvent) => {
       console.log('CmdK: Key pressed:', e.key, 'Meta:', e.metaKey, 'Ctrl:', e.ctrlKey);
       if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || e.key === 'Escape') {
@@ -32,16 +37,47 @@ const CommandMenu = () => {
   }, [open]);
 
   useEffect(() => {
-    if (search.length > 0) {
-      chrome.runtime.sendMessage({ type: 'SEARCH_BOOKMARKS', query: search }, (response) => {
-        if (response) {
-          setItems(response);
-        }
-      });
-    } else {
-        setItems([]);
+    if (open) {
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({ type: 'GET_BOOKMARKS' }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('CmdK Error:', chrome.runtime.lastError);
+            return;
+          }
+          if (response) {
+            setItems(response);
+          }
+        });
+      } else {
+        console.warn('CmdK: chrome.runtime is not available. Are you running strictly locally?');
+        // Mock data for development
+        setItems([
+            { id: '1', title: 'Mock Bookmark 1', url: 'https://example.com' },
+            { id: '2', title: 'Mock Bookmark 2', url: 'https://google.com' }
+        ]);
+      }
     }
-  }, [search]);
+  }, [open]);
+
+  useEffect(() => {
+    if (search.length > 0) {
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({ type: 'SEARCH_BOOKMARKS', query: search }, (response) => {
+          if (response) {
+            setItems(response);
+          }
+        });
+      }
+    } else if (open) { 
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+          chrome.runtime.sendMessage({ type: 'GET_BOOKMARKS' }, (response) => {
+            if (response) {
+              setItems(response);
+            }
+          });
+        }
+    }
+  }, [search, open]);
 
   // Handle opening URL
   const handleSelect = (url: string) => {
@@ -50,7 +86,7 @@ const CommandMenu = () => {
   };
 
   // Handle backdrop click to close
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       setOpen(false);
     }
@@ -59,13 +95,13 @@ const CommandMenu = () => {
   if (!open) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[99999] flex items-start justify-center bg-black/50 p-[16px] font-sans backdrop-blur-sm pt-[20vh]"
       onClick={handleBackdropClick}
     >
       <Command shouldFilter={false} className="w-full max-w-[640px] overflow-hidden rounded-xl border border-[#333] bg-[#0d1117] shadow-2xl text-gray-200 antialiased font-sans">
         <div className="flex items-center border-b border-[#333] px-[16px] relative" cmdk-input-wrapper="">
-          <Search className="mr-[12px] h-[20px] w-[20px] shrink-0 text-gray-500" />
+          <img src={logo} alt="CmdK Logo" className="mr-[12px] h-[28px] w-[28px] shrink-0 rounded-md" />
           <Command.Input
             className="flex h-[60px] w-full bg-transparent py-[16px] text-[16px] outline-none placeholder:text-gray-600 text-gray-200"
             placeholder="Type a command or search..."
