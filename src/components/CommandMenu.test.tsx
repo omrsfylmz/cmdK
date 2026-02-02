@@ -77,4 +77,25 @@ describe('CommandMenu', () => {
     // Expect NO warnings (we suppressed them)
     expect(consoleWarnSpy).not.toHaveBeenCalledWith(expect.stringContaining('Exception'));
   });
+
+  it('handles missing chrome API (strictly local mode) gracefully', async () => {
+    // Completely remove chrome global
+    vi.stubGlobal('chrome', undefined);
+
+    const consoleLogSpy = vi.spyOn(console, 'log');
+    
+    render(<CommandMenu />);
+    fireEvent.keyDown(window, { key: 'k', metaKey: true });
+
+    // Verify it opened first (logo presence indicates rendering content)
+    expect(screen.getByAltText('CmdK Logo')).toBeInTheDocument();
+
+    await waitFor(() => {
+        expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Extension updated or context invalidated'));
+    });
+
+    // cleanup is handled by vistes/jsdom environment reset usually, 
+    // but explicit restore if needed:
+    vi.stubGlobal('chrome', { runtime: { sendMessage: vi.fn(), lastError: undefined } });
+  });
 });
