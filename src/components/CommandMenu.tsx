@@ -38,44 +38,55 @@ const CommandMenu = () => {
 
   useEffect(() => {
     if (open) {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-        chrome.runtime.sendMessage({ type: 'GET_BOOKMARKS' }, (response) => {
-          if (chrome.runtime.lastError) {
-            console.error('CmdK Error:', chrome.runtime.lastError);
-            return;
-          }
-          if (response) {
-            setItems(response);
-          }
-        });
-      } else {
-        console.warn('CmdK: chrome.runtime is not available. Are you running strictly locally?');
-        // Mock data for development
-        setItems([
-            { id: '1', title: 'Mock Bookmark 1', url: 'https://example.com' },
-            { id: '2', title: 'Mock Bookmark 2', url: 'https://google.com' }
-        ]);
+      try {
+        if (chrome?.runtime?.sendMessage) {
+          chrome.runtime.sendMessage({ type: 'GET_BOOKMARKS' }, (response) => {
+            if (chrome.runtime.lastError) {
+              console.warn('CmdK: Runtime error (GET_BOOKMARKS):', JSON.stringify(chrome.runtime.lastError));
+              return;
+            }
+            if (response) {
+              setItems(response);
+            }
+          });
+        } else {
+            console.warn('CmdK: chrome.runtime.sendMessage is not available.');
+            // Fallback for dev/invalidated state
+            setItems([]); 
+        }
+      } catch (error) {
+        console.warn('CmdK: Exception in GET_BOOKMARKS:', error);
       }
     }
   }, [open]);
 
   useEffect(() => {
-    if (search.length > 0) {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-        chrome.runtime.sendMessage({ type: 'SEARCH_BOOKMARKS', query: search }, (response) => {
-          if (response) {
-            setItems(response);
-          }
-        });
-      }
-    } else if (open) { 
-        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-          chrome.runtime.sendMessage({ type: 'GET_BOOKMARKS' }, (response) => {
-            if (response) {
-              setItems(response);
-            }
-          });
+    try {
+        const isRuntimeAvailable = chrome?.runtime?.sendMessage;
+        
+        if (search.length > 0 && isRuntimeAvailable) {
+            chrome.runtime.sendMessage({ type: 'SEARCH_BOOKMARKS', query: search }, (response) => {
+                if (chrome.runtime.lastError) {
+                     // Suppress "Extension context invalidated" noise
+                     console.warn('CmdK: Runtime error (SEARCH):', JSON.stringify(chrome.runtime.lastError));
+                     return;
+                }
+                if (response) {
+                    setItems(response);
+                }
+            });
+        } else if (open && isRuntimeAvailable) { 
+             chrome.runtime.sendMessage({ type: 'GET_BOOKMARKS' }, (response) => {
+                if (chrome.runtime.lastError) {
+                    return;
+                }
+                if (response) {
+                    setItems(response);
+                }
+            });
         }
+    } catch (e) {
+        console.warn('CmdK: Exception in Search/Open effect:', e);
     }
   }, [search, open]);
 
