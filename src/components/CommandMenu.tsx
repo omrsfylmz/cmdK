@@ -111,6 +111,14 @@ const CommandMenu = () => {
     }
   };
 
+  // Detect OS for shortcut hint
+  const [isMac, setIsMac] = useState(true);
+
+  useEffect(() => {
+    // Simple detection
+    setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
+  }, []);
+
   if (!open) return null;
 
   return (
@@ -191,7 +199,7 @@ const CommandMenu = () => {
             <div className="flex flex-col items-center justify-center py-[48px] text-center text-gray-500">
                 <p className="text-[14px]">Type to search bookmarks...</p>
                 <div className="mt-4 flex gap-2">
-                    <span className="px-2 py-1 rounded bg-[#161b22] text-[11px] text-gray-400 border border-[#333]">CMD + K</span>
+                    <span className="px-2 py-1 rounded bg-[#161b22] text-[11px] text-gray-400 border border-[#333]">{isMac ? 'CMD' : 'CTRL'} + K</span>
                     <span className="px-2 py-1 rounded bg-[#161b22] text-[11px] text-gray-400 border border-[#333]">ESC</span>
                 </div>
             </div>

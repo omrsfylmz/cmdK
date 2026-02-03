@@ -35,6 +35,15 @@ describe('CommandMenu', () => {
     expect(screen.getByPlaceholderText(/Type a command or search/i)).toBeInTheDocument();
   });
 
+  it('opens with Ctrl+K (Windows/Linux)', () => {
+    render(<CommandMenu />);
+    
+    // Simulate Ctrl+K
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    
+    expect(screen.getByPlaceholderText(/Type a command or search/i)).toBeInTheDocument();
+  });
+
   it('fetches bookmarks on open', async () => {
     const mockBookmarks = [
       { id: '1', title: 'Test Bookmark', url: 'https://test.com' }
